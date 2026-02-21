@@ -64,7 +64,7 @@ export default function Dashboard() {
         {/* Terapias */}
         <div>
           <h2 className="text-xl font-display font-bold text-foreground mb-4">Terapias</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {TERAPIAS.map((t) => {
               const count = mockAtendimentos.filter((a) => a.tipoTerapia === t.nome).length;
               return (

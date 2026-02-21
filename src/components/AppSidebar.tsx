@@ -50,14 +50,14 @@ export function AppSidebar() {
             <img
               src={logoPsis}
               alt="PSIS"
-              className="h-10 w-10 rounded-full object-cover"
+              className="h-14 w-14 rounded-full object-cover"
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-sidebar-foreground truncate">
                 PSIS
               </p>
               <p className="text-xs text-sidebar-foreground/60 truncate">
-                GREME
+                Programa Saúde Integral do Ser
               </p>
             </div>
           </div>
