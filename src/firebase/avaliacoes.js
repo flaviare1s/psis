@@ -45,8 +45,11 @@ export async function getAvaliacoesByAssistido(assistidoId) {
     where("assistidoId", "==", assistidoId),
   );
   const querySnapshot = await getDocs(q);
-  const avaliacoes = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  
+  const avaliacoes = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
   // Ordenar por data no código para evitar necessidade de índice composto
   return avaliacoes.sort((a, b) => {
     return new Date(b.dataAvaliacao) - new Date(a.dataAvaliacao);

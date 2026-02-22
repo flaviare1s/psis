@@ -6,11 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, CheckCircle2, Circle } from "lucide-react";
 import * as LucideIcons from "lucide-react";
-import { getAssistido } from "@/firebase/assistidos";
-import { getAtendimentosByAssistido } from "@/firebase/atendimentos";
+import { getAssistido, updateAssistido } from "@/firebase/assistidos";
+import {
+  getAtendimentosByAssistido,
+  createAtendimento,
+  updateAtendimento,
+} from "@/firebase/atendimentos";
 import { getAvaliacoesByAssistido } from "@/firebase/avaliacoes";
 import { getTerapias } from "@/firebase/terapias";
 import { useAuth } from "@/lib/auth-context";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 interface Assistido {
   id: string;
@@ -55,11 +71,26 @@ export default function AssistidoDetalhe() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [assistido, setAssistido] = useState<Assistido | null>(null);
   const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [terapias, setTerapias] = useState<Terapia[]>([]);
   const [loading, setLoading] = useState(true);
+  const [observacoesGerais, setObservacoesGerais] = useState("");
+  const [isSavingObservacoes, setIsSavingObservacoes] = useState(false);
+
+  // Estados para o dialog de sessão
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [sessaoEdit, setSessaoEdit] = useState<{
+    terapiaNome: string;
+    atendimentoId: string | null;
+    sessaoIndex: number;
+    sessao: Sessao | null;
+  } | null>(null);
+  const [dataTemporaria, setDataTemporaria] = useState("");
+  const [observacoesTemporaria, setObservacoesTemporaria] = useState("");
+  const [presenteTemporario, setPresenteTemporario] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -72,6 +103,7 @@ export default function AssistidoDetalhe() {
       // Carregar assistido primeiro (essencial)
       const assistidoData = await getAssistido(id);
       setAssistido(assistidoData as Assistido);
+      setObservacoesGerais(assistidoData?.observacoes || "");
 
       // Carregar terapias (essencial)
       const terapiasData = await getTerapias();
@@ -104,6 +136,101 @@ export default function AssistidoDetalhe() {
   const getIconComponent = (iconName: string) => {
     const Icon = (LucideIcons as any)[iconName];
     return Icon || LucideIcons.Circle;
+  };
+
+  const handleClickSessao = (
+    terapiaNome: string,
+    atendimentoId: string | null,
+    sessaoIndex: number,
+    sessao: Sessao | null,
+  ) => {
+    setSessaoEdit({ terapiaNome, atendimentoId, sessaoIndex, sessao });
+    setDataTemporaria(sessao?.data || new Date().toISOString().split("T")[0]);
+    setObservacoesTemporaria(sessao?.observacoes || "");
+    setPresenteTemporario(sessao?.presente || false);
+    setDialogOpen(true);
+  };
+
+  const handleSalvarSessao = async () => {
+    if (!id || !sessaoEdit) return;
+
+    try {
+      let atendimentoId = sessaoEdit.atendimentoId;
+
+      // Se não existe atendimento, criar um novo
+      if (!atendimentoId) {
+        atendimentoId = await createAtendimento({
+          assistidoId: id,
+          terapeutaId: user?.uid || "sistema",
+          tipoTerapia: sessaoEdit.terapiaNome,
+        });
+      }
+
+      // Buscar o atendimento atual
+      const atendimentoAtual = atendimentos.find((a) => a.id === atendimentoId);
+      const sessoesAtualizadas =
+        atendimentoAtual?.sessoes ||
+        Array.from({ length: 10 }, (_, i) => ({
+          numero: i + 1,
+          data: null,
+          presente: false,
+          observacoes: "",
+        }));
+
+      // Atualizar a sessão específica
+      sessoesAtualizadas[sessaoEdit.sessaoIndex] = {
+        numero: sessaoEdit.sessaoIndex + 1,
+        data: dataTemporaria,
+        presente: presenteTemporario,
+        observacoes: observacoesTemporaria,
+      };
+
+      // Atualizar no Firebase
+      await updateAtendimento(atendimentoId, {
+        sessoes: sessoesAtualizadas,
+      });
+
+      toast({
+        title: "Sucesso",
+        description: "Sessão atualizada com sucesso.",
+      });
+
+      // Recarregar dados
+      await loadData();
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Erro ao salvar sessão:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar a sessão.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSalvarObservacoes = async () => {
+    if (!id) return;
+
+    setIsSavingObservacoes(true);
+    try {
+      await updateAssistido(id, {
+        observacoes: observacoesGerais,
+      });
+
+      toast({
+        title: "Sucesso",
+        description: "Observações salvas com sucesso.",
+      });
+    } catch (error) {
+      console.error("Erro ao salvar observações:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar as observações.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingObservacoes(false);
+    }
   };
 
   if (loading) {
@@ -190,10 +317,18 @@ export default function AssistidoDetalhe() {
                         return (
                           <div
                             key={i}
-                            className={`flex flex-col items-center p-2 rounded-lg border transition-colors ${
+                            onClick={() =>
+                              handleClickSessao(
+                                terapia.nome,
+                                atendimento?.id || null,
+                                i,
+                                sessao || null,
+                              )
+                            }
+                            className={`flex flex-col items-center p-2 rounded-lg border transition-all cursor-pointer hover:shadow-md ${
                               presente
-                                ? "bg-primary/10 border-primary/30"
-                                : "bg-muted/30 border-border/50"
+                                ? "bg-primary/10 border-primary/30 hover:bg-primary/20"
+                                : "bg-muted/30 border-border/50 hover:bg-muted/50"
                             }`}
                           >
                             <span className="text-xs font-bold text-muted-foreground">
@@ -273,6 +408,85 @@ export default function AssistidoDetalhe() {
             </div>
           </div>
         )}
+
+        {/* Observações Gerais */}
+        <div>
+          <h2 className="text-xl font-bold text-foreground mb-4">
+            Observações Gerais
+          </h2>
+          <Card className="border-border/50">
+            <CardContent className="p-4">
+              <Textarea
+                placeholder="Adicione observações gerais sobre o assistido (opcional)..."
+                value={observacoesGerais}
+                onChange={(e) => setObservacoesGerais(e.target.value)}
+                className="min-h-[120px]"
+              />
+              <div className="flex justify-end mt-3">
+                <Button
+                  onClick={handleSalvarObservacoes}
+                  disabled={isSavingObservacoes}
+                >
+                  {isSavingObservacoes ? "Salvando..." : "Salvar Observações"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Dialog para editar sessão */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {sessaoEdit &&
+                  `${sessaoEdit.terapiaNome} - ${sessaoEdit.sessaoIndex + 1}ª Sessão`}
+              </DialogTitle>
+              <DialogDescription>
+                Registre a presença e adicione informações sobre esta sessão.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-2">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="presente"
+                  checked={presenteTemporario}
+                  onChange={(e) => setPresenteTemporario(e.target.checked)}
+                  className="h-4 w-4"
+                />
+                <Label htmlFor="presente">Marcar como presente</Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="data">Data da sessão</Label>
+                <Input
+                  id="data"
+                  type="date"
+                  value={dataTemporaria}
+                  onChange={(e) => setDataTemporaria(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="observacoes">Observações (opcional)</Label>
+                <Textarea
+                  id="observacoes"
+                  placeholder="Adicione observações sobre esta sessão..."
+                  value={observacoesTemporaria}
+                  onChange={(e) => setObservacoesTemporaria(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSalvarSessao}>Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
