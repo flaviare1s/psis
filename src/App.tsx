@@ -15,6 +15,7 @@ import Metricas from "./pages/Metricas";
 import Terapias from "./pages/Terapias";
 import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
+import { ScrollToTop } from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             v7_relativeSplatPath: true,
           }}
         >
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Login />} />
             <Route
