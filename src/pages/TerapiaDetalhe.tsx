@@ -228,7 +228,7 @@ export default function TerapiaDetalhe() {
                     </p>
                   </div>
                   <stat.icon
-                    className={`h-6 w-6 sm:h-8 sm:w-8 ${stat.color} opacity-80 flex-shrink-0`}
+                    className={`hidden sm:block h-6 w-6 sm:h-8 sm:w-8 ${stat.color} opacity-80 flex-shrink-0`}
                   />
                 </div>
               </CardContent>
