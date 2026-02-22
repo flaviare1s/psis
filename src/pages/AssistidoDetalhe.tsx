@@ -135,7 +135,9 @@ export default function AssistidoDetalhe() {
   }, [loadData]);
 
   const getIconComponent = (iconName: string) => {
-    const Icon = (LucideIcons as any)[iconName];
+    const Icon = (
+      LucideIcons as unknown as Record<string, React.ComponentType>
+    )[iconName];
     return Icon || LucideIcons.Circle;
   };
 
@@ -162,7 +164,6 @@ export default function AssistidoDetalhe() {
       if (!atendimentoId) {
         atendimentoId = await createAtendimento({
           assistidoId: id,
-          terapeutaId: user?.uid || "sistema",
           tipoTerapia: sessaoEdit.terapiaNome,
         });
       }
@@ -338,7 +339,7 @@ export default function AssistidoDetalhe() {
                             {presente ? (
                               <>
                                 <CheckCircle2 className="h-5 w-5 text-primary my-1" />
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text-[10px] text-muted-foreground min-h-[14px]">
                                   {sessao?.data
                                     ? new Date(sessao.data).toLocaleDateString(
                                         "pt-BR",
@@ -348,7 +349,12 @@ export default function AssistidoDetalhe() {
                                 </span>
                               </>
                             ) : (
-                              <Circle className="h-5 w-5 text-border my-1" />
+                              <>
+                                <Circle className="h-5 w-5 text-border my-1" />
+                                <span className="text-[10px] text-transparent min-h-[14px]">
+                                  00/00
+                                </span>
+                              </>
                             )}
                           </div>
                         );
