@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 
 interface Assistido {
@@ -92,11 +93,7 @@ export default function AssistidoDetalhe() {
   const [observacoesTemporaria, setObservacoesTemporaria] = useState("");
   const [presenteTemporario, setPresenteTemporario] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, [id]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -131,7 +128,11 @@ export default function AssistidoDetalhe() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const getIconComponent = (iconName: string) => {
     const Icon = (LucideIcons as any)[iconName];
@@ -448,14 +449,14 @@ export default function AssistidoDetalhe() {
             </DialogHeader>
             <div className="space-y-4 mt-2">
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="presente"
                   checked={presenteTemporario}
-                  onChange={(e) => setPresenteTemporario(e.target.checked)}
-                  className="h-4 w-4"
+                  onCheckedChange={(checked) => setPresenteTemporario(checked as boolean)}
                 />
-                <Label htmlFor="presente">Marcar como presente</Label>
+                <Label htmlFor="presente" className="cursor-pointer">
+                  Marcar como presente
+                </Label>
               </div>
 
               <div className="space-y-2">

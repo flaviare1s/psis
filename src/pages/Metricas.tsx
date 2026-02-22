@@ -116,7 +116,7 @@ export default function Metricas() {
           <Card className="border-border/50">
             <CardContent className="p-4 text-center">
               <p className="text-3xl font-bold text-accent">{totalSessoes}</p>
-              <p className="text-sm text-muted-foreground">Total de Sessões</p>
+              <p className="text-sm text-muted-foreground">Total de Atendimentos Realizados</p>
             </CardContent>
           </Card>
           <Card className="border-border/50">
