@@ -211,16 +211,10 @@ export default function TerapiaDetalhe() {
           </Button>
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Sparkle className="h-6 w-6 text-primary" />
-              </div>
               <div>
                 <h1 className="text-3xl font-bold text-foreground">
                   {terapia.nome}
                 </h1>
-                <p className="text-muted-foreground mt-1">
-                  Métricas e estatísticas da terapia
-                </p>
               </div>
             </div>
           </div>
