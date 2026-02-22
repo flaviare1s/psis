@@ -93,11 +93,12 @@ export default function Configuracoes() {
       setOpenCreate(false);
       resetForm();
       loadUsuarios();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erro ao criar usuário:", error);
+      const errorMessage = error instanceof Error ? error.message : "Não foi possível criar o usuário.";
       toast({
         title: "Erro",
-        description: error.message || "Não foi possível criar o usuário.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

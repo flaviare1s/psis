@@ -2,6 +2,10 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
 import { auth } from "./config";
 import { getUsuarioByUid, createUsuario } from "./usuarios";
@@ -43,4 +47,29 @@ export async function createUser(email, password, nome, role) {
   await createUsuario(uid, { nome, email, role });
 
   return uid;
+}
+
+/**
+ * Envia email para redefinir senha
+ */
+export async function resetPassword(email) {
+  await sendPasswordResetEmail(auth, email);
+}
+
+/**
+ * Altera a senha do usuário atual
+ * Requer reautenticação recente
+ */
+export async function changePassword(currentPassword, newPassword) {
+  const user = auth.currentUser;
+  if (!user || !user.email) {
+    throw new Error("Usuário não autenticado");
+  }
+
+  // Reautenticar o usuário
+  const credential = EmailAuthProvider.credential(user.email, currentPassword);
+  await reauthenticateWithCredential(user, credential);
+
+  // Atualizar a senha
+  await updatePassword(user, newPassword);
 }

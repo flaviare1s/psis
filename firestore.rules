@@ -1,0 +1,64 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Função helper para verificar se o usuário está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Função helper para verificar se o usuário é admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Função helper para verificar se é o próprio usuário
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+    
+    // Regras para coleção de usuários
+    match /usuarios/{userId} {
+      // Qualquer pessoa autenticada pode ler usuários (necessário para listar terapeutas, etc)
+      allow read: if isAuthenticated();
+      
+      // Apenas admins podem criar usuários
+      allow create: if isAdmin();
+      
+      // Admins podem atualizar qualquer usuário
+      // Usuários podem atualizar apenas seus próprios dados (exceto role)
+      allow update: if isAdmin() || 
+                       (isOwner(userId) && 
+                        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
+      
+      // Apenas admins podem deletar usuários
+      allow delete: if isAdmin();
+    }
+    
+    // Regras para coleção de assistidos
+    match /assistidos/{assistidoId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Regras para coleção de atendimentos
+    match /atendimentos/{atendimentoId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Regras para coleção de avaliações
+    match /avaliacoes/{avaliacaoId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Regras para coleção de terapias
+    match /terapias/{terapiaId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}
