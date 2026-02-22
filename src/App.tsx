@@ -13,6 +13,7 @@ import Atendimentos from "./pages/Atendimentos";
 import Avaliacoes from "./pages/Avaliacoes";
 import Metricas from "./pages/Metricas";
 import Terapias from "./pages/Terapias";
+import TerapiaDetalhe from "./pages/TerapiaDetalhe";
 import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -87,6 +88,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Terapias />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/terapias/:id"
+              element={
+                <ProtectedRoute>
+                  <TerapiaDetalhe />
                 </ProtectedRoute>
               }
             />
