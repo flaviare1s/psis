@@ -226,7 +226,7 @@ export default function Assistidos() {
                     </div>
                   </div>
                   <span
-                    className={`text-base px-2 py-1 rounded-full font-medium ${a.status === "Ativo" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${a.status === "Ativo" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
                   >
                     {a.status}
                   </span>
