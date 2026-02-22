@@ -3,7 +3,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { getAssistidos, createAssistido } from "@/firebase/assistidos";
@@ -33,6 +34,8 @@ export default function Assistidos() {
   const [atendimentosCount, setAtendimentosCount] = useState<
     Record<string, number>
   >({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 30;
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -98,9 +101,21 @@ export default function Assistidos() {
     }
   };
 
-  const filtrados = assistidos.filter((a) =>
-    a.nome.toLowerCase().includes(busca.toLowerCase()),
+  const filtrados = assistidos
+    .filter((a) => a.nome.toLowerCase().includes(busca.toLowerCase()))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+
+  const totalPages = Math.ceil(filtrados.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const assistidosPaginados = filtrados.slice(
+    startIndex,
+    startIndex + itemsPerPage,
   );
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (loading) {
     return (
@@ -164,8 +179,32 @@ export default function Assistidos() {
           />
         </div>
 
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span>
+              Página {currentPage} de {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+
         <div className="grid gap-3">
-          {filtrados.map((a) => {
+          {assistidosPaginados.map((a) => {
             const count = atendimentosCount[a.id] || 0;
             return (
               <Card

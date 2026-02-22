@@ -2,7 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import {
+  Plus,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -57,6 +64,8 @@ export default function Avaliacoes() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 30;
   const { toast } = useToast();
 
   // Form states
@@ -173,6 +182,24 @@ export default function Avaliacoes() {
       default:
         return "secondary";
     }
+  };
+
+  // Ordenar avaliações alfabeticamente por nome do assistido
+  const avaliacoesOrdenadas = [...avaliacoes].sort((a, b) => {
+    const nomeA = getAssistidoNome(a.assistidoId);
+    const nomeB = getAssistidoNome(b.assistidoId);
+    return nomeA.localeCompare(nomeB);
+  });
+
+  // Paginação
+  const totalPages = Math.ceil(avaliacoesOrdenadas.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const avaliacoesPaginadas = avaliacoesOrdenadas.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (loading) {
@@ -349,59 +376,114 @@ export default function Avaliacoes() {
               </CardContent>
             </Card>
           ) : (
-            avaliacoes.map((av) => (
-              <Card
-                key={av.id}
-                className="border-border/50 hover:shadow-md transition-all"
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-foreground">
-                          {getAssistidoNome(av.assistidoId)}
-                        </p>
-                        <span className="text-muted-foreground">•</span>
-                        <p className="text-sm text-muted-foreground">
-                          {av.tipoTerapia}
+            <>
+              {avaliacoesPaginadas.map((av) => (
+                <Card
+                  key={av.id}
+                  className="border-border/50 hover:shadow-md transition-all"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div>
+                          <p className="font-semibold text-foreground truncate">
+                            {getAssistidoNome(av.assistidoId)}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {av.tipoTerapia}
+                          </p>
+                        </div>
+
+                        {av.observacoes && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {av.observacoes}
+                          </p>
+                        )}
+
+                        {av.encaminhamentos.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {av.encaminhamentos.map((enc, idx) => (
+                              <span
+                                key={idx}
+                                className="text-xs bg-secondary px-2 py-0.5 rounded-full text-secondary-foreground"
+                              >
+                                {enc}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(av.dataAvaliacao).toLocaleDateString(
+                            "pt-BR",
+                          )}
                         </p>
                       </div>
 
-                      {av.observacoes && (
-                        <p className="text-sm text-muted-foreground">
-                          {av.observacoes}
-                        </p>
-                      )}
-
-                      {av.encaminhamentos.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {av.encaminhamentos.map((enc, idx) => (
-                            <span
-                              key={idx}
-                              className="text-xs bg-secondary px-2 py-0.5 rounded-full text-secondary-foreground"
-                            >
-                              {enc}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(av.dataAvaliacao).toLocaleDateString("pt-BR")}
-                      </p>
+                      <Badge
+                        variant={getStatusVariant(av.statusEvolucao)}
+                        className="flex items-center justify-center h-8 w-8 p-0 shrink-0"
+                      >
+                        {getStatusIcon(av.statusEvolucao)}
+                      </Badge>
                     </div>
+                  </CardContent>
+                </Card>
+              ))}
 
-                    <Badge
-                      variant={getStatusVariant(av.statusEvolucao)}
-                      className="flex items-center gap-1"
-                    >
-                      {getStatusIcon(av.statusEvolucao)}
-                      <span>{av.statusEvolucao}</span>
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+              {/* Legenda */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Badge variant="default" className="flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" />
+                  </Badge>
+                  <span className="text-muted-foreground">Melhora</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Badge>
+                  <span className="text-muted-foreground">Estável</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="destructive"
+                    className="flex items-center gap-1"
+                  >
+                    <TrendingDown className="h-3 w-3" />
+                  </Badge>
+                  <span className="text-muted-foreground">Piora</span>
+                </div>
+              </div>
+
+              {/* Paginação */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
