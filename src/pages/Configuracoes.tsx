@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Shield, User } from "lucide-react";
 import { useAuth, Usuario } from "@/lib/auth-context";
 import { getUsuarios, updateUsuario, deleteUsuario } from "@/firebase/usuarios";
 import { createUser } from "@/firebase/auth";
@@ -297,7 +297,24 @@ export default function Configuracoes() {
           </Dialog>
         </div>
 
-        <Usuarios usuarios={usuarios} openEditDialog={openEditDialog} openDeleteDialog={openDeleteDialog} currentUser={currentUser} />
+        <Usuarios
+          usuarios={usuarios}
+          openEditDialog={openEditDialog}
+          openDeleteDialog={openDeleteDialog}
+          currentUser={currentUser}
+        />
+        <div className="px-4 py-3 border-t border-border bg-muted/30">
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Shield className="h-3.5 w-3.5 text-primary" />
+              <span>Admin</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <User className="h-3.5 w-3.5" />
+              <span>Colaborador</span>
+            </div>
+          </div>
+        </div>
 
         {/* Dialog de Edição */}
         <Dialog open={openEdit} onOpenChange={setOpenEdit}>
