@@ -219,7 +219,7 @@ export default function TerapiaDetalhe() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {stats.map((stat) => (
             <Card key={stat.label} className="border-border/50">
               <CardContent className="p-4">
