@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth-context";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Assistidos from "./pages/Assistidos";
@@ -24,12 +25,54 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/assistidos" element={<Assistidos />} />
-            <Route path="/assistidos/:id" element={<AssistidoDetalhe />} />
-            <Route path="/atendimentos" element={<Atendimentos />} />
-            <Route path="/metricas" element={<Metricas />} />
-            <Route path="/configuracoes" element={<Configuracoes />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/assistidos"
+              element={
+                <ProtectedRoute>
+                  <Assistidos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/assistidos/:id"
+              element={
+                <ProtectedRoute>
+                  <AssistidoDetalhe />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/atendimentos"
+              element={
+                <ProtectedRoute>
+                  <Atendimentos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/metricas"
+              element={
+                <ProtectedRoute>
+                  <Metricas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/configuracoes"
+              element={
+                <ProtectedRoute>
+                  <Configuracoes />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
