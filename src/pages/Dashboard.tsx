@@ -135,7 +135,7 @@ export default function Dashboard() {
             Painel de Controle
           </h1>
           <p className="text-muted-foreground mt-1">
-            Bem-vindo ao sistema de gestão PSIS
+            Sistema de gestão do PSIS
           </p>
         </div>
 
