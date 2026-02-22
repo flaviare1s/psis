@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Assistidos from "./pages/Assistidos";
 import AssistidoDetalhe from "./pages/AssistidoDetalhe";
 import Atendimentos from "./pages/Atendimentos";
+import Avaliacoes from "./pages/Avaliacoes";
 import Metricas from "./pages/Metricas";
 import Terapias from "./pages/Terapias";
 import Configuracoes from "./pages/Configuracoes";
@@ -60,6 +61,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Atendimentos />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/avaliacoes"
+              element={
+                <ProtectedRoute>
+                  <Avaliacoes />
                 </ProtectedRoute>
               }
             />

@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Users,
   ClipboardList,
+  ClipboardCheck,
   BarChart3,
   Settings,
   Sparkles,
@@ -27,6 +28,7 @@ const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Assistidos", url: "/assistidos", icon: Users },
   { title: "Atendimentos", url: "/atendimentos", icon: ClipboardList },
+  { title: "Avaliações", url: "/avaliacoes", icon: ClipboardCheck },
   { title: "Métricas", url: "/metricas", icon: BarChart3 },
 ];
 
