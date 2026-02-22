@@ -11,6 +11,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  Legend,
 } from "recharts";
 import { getAtendimentos } from "@/firebase/atendimentos";
 import { getAvaliacoes } from "@/firebase/avaliacoes";
@@ -222,13 +223,16 @@ export default function Metricas() {
                       cx="50%"
                       cy="50%"
                       outerRadius={80}
-                      label
+                      label={({ percent }) =>
+                        `${(percent * 100).toFixed(0)}%`
+                      }
                     >
                       {evolucaoData.map((_, i) => (
                         <Cell key={i} fill={pieColors[i]} />
                       ))}
                     </Pie>
                     <Tooltip />
+                    <Legend />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
