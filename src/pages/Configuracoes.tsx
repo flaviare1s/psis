@@ -168,10 +168,12 @@ export default function Configuracoes() {
     setSubmitting(true);
     try {
       if (isDeletingSelf) {
-        // Se está deletando a própria conta, deletar do Authentication primeiro
-        await deleteCurrentUser(senhaConfirmacao);
-        // Depois deletar do Firestore
+        // Se está deletando a própria conta, deletar do Firestore PRIMEIRO
+        // (se deletar do Authentication primeiro, perde permissão no Firestore)
         await deleteUsuario(selectedUser.id);
+
+        // Depois deletar do Authentication
+        await deleteCurrentUser(senhaConfirmacao);
 
         toast({
           title: "Sucesso",
