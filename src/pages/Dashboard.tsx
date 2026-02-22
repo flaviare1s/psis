@@ -187,7 +187,7 @@ export default function Dashboard() {
                       {t.nome}
                     </h3>
                     <p className="text-base text-muted-foreground mt-1">
-                      {count} atendimento(s)
+                      {count} {count === 1 ? "atendimento" : "atendimentos"}
                     </p>
                   </CardContent>
                 </Card>
