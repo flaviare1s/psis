@@ -175,7 +175,7 @@ export default function Dashboard() {
                 <Card
                   key={t.id}
                   className="cursor-pointer hover:shadow-lg transition-all duration-200 border-border/50 hover:scale-[1.02]"
-                  onClick={() => navigate("/atendimentos")}
+                  onClick={() => navigate(`/terapias/${t.id}`)}
                 >
                   <CardContent className="p-5">
                     <div

@@ -155,7 +155,7 @@ export default function AssistidoDetalhe() {
   };
 
   const handleSalvarSessao = async () => {
-    if (!id || !sessaoEdit) return;
+    if (!id || !sessaoEdit || !user) return;
 
     try {
       let atendimentoId = sessaoEdit.atendimentoId;
@@ -164,6 +164,7 @@ export default function AssistidoDetalhe() {
       if (!atendimentoId) {
         atendimentoId = await createAtendimento({
           assistidoId: id,
+          terapeutaId: user.id,
           tipoTerapia: sessaoEdit.terapiaNome,
         });
       }
