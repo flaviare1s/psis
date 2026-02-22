@@ -379,9 +379,18 @@ export default function Configuracoes() {
             <AlertDialogHeader>
               <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
               <AlertDialogDescription>
-                Tem certeza que deseja excluir o usuário{" "}
-                <strong>{selectedUser?.nome}</strong>? Esta ação não pode ser
-                desfeita.
+                {selectedUser?.id === currentUser?.id ? (
+                  <>
+                    Tem certeza que deseja excluir <strong>sua conta</strong>?
+                    Esta ação não pode ser desfeita.
+                  </>
+                ) : (
+                  <>
+                    Tem certeza que deseja excluir o usuário{" "}
+                    <strong>{selectedUser?.nome}</strong>? Esta ação não pode
+                    ser desfeita.
+                  </>
+                )}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
