@@ -300,7 +300,8 @@ export default function TerapiaDetalhe() {
                   return (
                     <div
                       key={atendimento.id}
-                      className="px-4 py-3 hover:bg-muted/50 transition-colors"
+                      className="px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                      onClick={() => navigate(`/assistidos/${atendimento.assistidoId}`)}
                     >
                       <div className="flex items-center justify-between">
                         <div>
