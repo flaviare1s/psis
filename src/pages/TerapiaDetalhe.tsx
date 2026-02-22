@@ -3,12 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowLeft,
-  CalendarCheck,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { ArrowLeft, CalendarCheck, TrendingUp, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getTerapias } from "@/firebase/terapias";
 import { getAtendimentos } from "@/firebase/atendimentos";
@@ -219,20 +214,22 @@ export default function TerapiaDetalhe() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {stats.map((stat) => (
             <Card key={stat.label} className="border-border/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
                       {stat.label}
                     </p>
-                    <p className="text-2xl font-bold text-foreground mt-1">
+                    <p className="text-xl sm:text-2xl font-bold text-foreground mt-0.5 sm:mt-1">
                       {stat.value}
                     </p>
                   </div>
-                  <stat.icon className={`h-8 w-8 ${stat.color} opacity-80`} />
+                  <stat.icon
+                    className={`h-6 w-6 sm:h-8 sm:w-8 ${stat.color} opacity-80 flex-shrink-0`}
+                  />
                 </div>
               </CardContent>
             </Card>
