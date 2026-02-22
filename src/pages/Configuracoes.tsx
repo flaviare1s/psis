@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,13 +32,14 @@ import {
 import { Plus, Shield, User } from "lucide-react";
 import { useAuth, Usuario } from "@/lib/auth-context";
 import { getUsuarios, updateUsuario, deleteUsuario } from "@/firebase/usuarios";
-import { createUser } from "@/firebase/auth";
+import { createUser, deleteCurrentUser } from "@/firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { Usuarios } from "../components/Usuarios";
 
 export default function Configuracoes() {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, logout } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const [openCreate, setOpenCreate] = useState(false);
@@ -49,6 +51,7 @@ export default function Configuracoes() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [senhaConfirmacao, setSenhaConfirmacao] = useState("");
   const [role, setRole] = useState<"admin" | "colaborador">("colaborador");
   const [submitting, setSubmitting] = useState(false);
 
@@ -150,21 +153,65 @@ export default function Configuracoes() {
   const handleDelete = async () => {
     if (!selectedUser) return;
 
-    setSubmitting(true);
-    try {
-      await deleteUsuario(selectedUser.id);
-      toast({
-        title: "Sucesso",
-        description: "Usuário deletado com sucesso.",
-      });
-      setOpenDelete(false);
-      setSelectedUser(null);
-      loadUsuarios();
-    } catch (error) {
-      console.error("Erro ao deletar usuário:", error);
+    const isDeletingSelf = selectedUser.id === currentUser?.id;
+
+    // Se está deletando a própria conta, validar senha
+    if (isDeletingSelf && !senhaConfirmacao.trim()) {
       toast({
         title: "Erro",
-        description: "Não foi possível deletar o usuário.",
+        description: "Digite sua senha para confirmar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      if (isDeletingSelf) {
+        // Se está deletando a própria conta, deletar do Authentication primeiro
+        await deleteCurrentUser(senhaConfirmacao);
+        // Depois deletar do Firestore
+        await deleteUsuario(selectedUser.id);
+
+        toast({
+          title: "Sucesso",
+          description: "Sua conta foi deletada com sucesso.",
+        });
+        setOpenDelete(false);
+        setSelectedUser(null);
+        setSenhaConfirmacao("");
+
+        // Deslogar e redirecionar
+        await logout();
+        navigate("/");
+      } else {
+        // Se é admin deletando outro usuário, deletar apenas do Firestore
+        await deleteUsuario(selectedUser.id);
+
+        toast({
+          title: "Sucesso",
+          description: "Usuário deletado com sucesso.",
+        });
+        setOpenDelete(false);
+        setSelectedUser(null);
+        loadUsuarios();
+      }
+    } catch (error) {
+      console.error("Erro ao deletar usuário:", error);
+
+      let errorMessage = "Não foi possível deletar o usuário.";
+      if (error && typeof error === "object" && "code" in error) {
+        const firebaseError = error as { code: string };
+        if (firebaseError.code === "auth/wrong-password") {
+          errorMessage = "Senha incorreta.";
+        } else if (firebaseError.code === "auth/too-many-requests") {
+          errorMessage = "Muitas tentativas. Tente novamente mais tarde.";
+        }
+      }
+
+      toast({
+        title: "Erro",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -182,6 +229,7 @@ export default function Configuracoes() {
 
   const openDeleteDialog = (usuario: Usuario) => {
     setSelectedUser(usuario);
+    setSenhaConfirmacao("");
     setOpenDelete(true);
   };
 
@@ -393,6 +441,23 @@ export default function Configuracoes() {
                 )}
               </AlertDialogDescription>
             </AlertDialogHeader>
+
+            {selectedUser?.id === currentUser?.id && (
+              <div className="space-y-2 px-6">
+                <Label htmlFor="senha-confirmacao">
+                  Digite sua senha para confirmar
+                </Label>
+                <Input
+                  id="senha-confirmacao"
+                  type="password"
+                  value={senhaConfirmacao}
+                  onChange={(e) => setSenhaConfirmacao(e.target.value)}
+                  placeholder="Sua senha atual"
+                  disabled={submitting}
+                />
+              </div>
+            )}
+
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
               <AlertDialogAction

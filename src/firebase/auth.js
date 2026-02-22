@@ -6,6 +6,7 @@ import {
   updatePassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
+  deleteUser,
 } from "firebase/auth";
 import { auth, secondaryAuth } from "./config";
 import { getUsuarioByUid, createUsuario } from "./usuarios";
@@ -77,4 +78,23 @@ export async function changePassword(currentPassword, newPassword) {
 
   // Atualizar a senha
   await updatePassword(user, newPassword);
+}
+
+/**
+ * Deleta o usuário autenticado atual da Firebase Authentication
+ * Deve ser usado apenas quando o usuário quer deletar sua própria conta
+ * Requer a senha atual para reautenticação
+ */
+export async function deleteCurrentUser(currentPassword) {
+  const user = auth.currentUser;
+  if (!user || !user.email) {
+    throw new Error("Usuário não autenticado");
+  }
+
+  // Reautenticar antes de deletar (requisito do Firebase)
+  const credential = EmailAuthProvider.credential(user.email, currentPassword);
+  await reauthenticateWithCredential(user, credential);
+
+  // Deletar o usuário
+  await deleteUser(user);
 }
