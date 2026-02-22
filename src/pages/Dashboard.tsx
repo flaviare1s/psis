@@ -1,13 +1,57 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, CalendarCheck, TrendingUp, Heart } from "lucide-react";
+import {
+  Users,
+  CalendarCheck,
+  TrendingUp,
+  Heart,
+  LucideIcon,
+} from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getAssistidos } from "@/firebase/assistidos";
 import { getAtendimentos } from "@/firebase/atendimentos";
 import { getAvaliacoes } from "@/firebase/avaliacoes";
 import { getTerapias } from "@/firebase/terapias";
+
+interface Assistido {
+  id: string;
+  nome: string;
+  status: "Ativo" | "Inativo";
+  dataInicio: string;
+  criadoEm: string;
+  atualizadoEm?: string;
+}
+
+interface Sessao {
+  numero: number;
+  data: string | null;
+  presente: boolean;
+  observacoes: string;
+}
+
+interface Atendimento {
+  id: string;
+  assistidoId: string;
+  terapeutaId: string;
+  tipoTerapia: string;
+  sessoes: Sessao[];
+  criadoEm: string;
+  atualizadoEm?: string;
+}
+
+interface Avaliacao {
+  id: string;
+  assistidoId: string;
+  tipoTerapia: string;
+  statusEvolucao: "Melhora" | "Estável" | "Piora";
+  dataAvaliacao: string;
+  observacoes: string;
+  encaminhamentos: string[];
+  criadoEm: string;
+  atualizadoEm?: string;
+}
 
 interface Terapia {
   id: string;
@@ -18,9 +62,9 @@ interface Terapia {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [assistidos, setAssistidos] = useState<any[]>([]);
-  const [atendimentos, setAtendimentos] = useState<any[]>([]);
-  const [avaliacoes, setAvaliacoes] = useState<any[]>([]);
+  const [assistidos, setAssistidos] = useState<Assistido[]>([]);
+  const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [terapias, setTerapias] = useState<Terapia[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,8 +93,9 @@ export default function Dashboard() {
     }
   };
 
-  const getIconComponent = (iconName: string) => {
-    const Icon = (LucideIcons as any)[iconName];
+  const getIconComponent = (iconName: string): LucideIcon => {
+    const iconsMap = LucideIcons as unknown as Record<string, LucideIcon>;
+    const Icon = iconsMap[iconName];
     return Icon || LucideIcons.Circle;
   };
 
@@ -183,7 +228,7 @@ export default function Dashboard() {
                           <p className="text-xs text-muted-foreground">
                             {atendimentosAssistido.length > 0
                               ? atendimentosAssistido
-                                  .map((at: any) => at.tipoTerapia)
+                                  .map((at) => at.tipoTerapia)
                                   .join(", ")
                               : "Sem terapia"}
                           </p>
