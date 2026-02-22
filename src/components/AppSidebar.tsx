@@ -60,7 +60,7 @@ export function AppSidebar() {
               <p className="text-base font-bold text-sidebar-foreground truncate">
                 PSIS
               </p>
-              <p className="text-base text-sidebar-foreground/60 truncate">
+              <p className="text-xs text-sidebar-foreground/60 truncate">
                 Programa Saúde Integral do Ser
               </p>
             </div>
