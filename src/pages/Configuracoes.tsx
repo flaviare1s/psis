@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,6 +33,7 @@ import { useAuth, Usuario } from "@/lib/auth-context";
 import { getUsuarios, updateUsuario, deleteUsuario } from "@/firebase/usuarios";
 import { createUser } from "@/firebase/auth";
 import { useToast } from "@/hooks/use-toast";
+import { Usuarios } from "../components/Usuarios";
 
 export default function Configuracoes() {
   const { user: currentUser } = useAuth();
@@ -298,54 +297,7 @@ export default function Configuracoes() {
           </Dialog>
         </div>
 
-        <Card className="border-border/50">
-          <CardHeader>
-            <CardTitle className="text-base">Usuários Cadastrados</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="divide-y divide-border">
-              {usuarios.map((u) => (
-                <div
-                  key={u.id}
-                  className="flex items-center justify-between px-4 py-3"
-                >
-                  <div>
-                    <p className="font-medium text-sm text-foreground">
-                      {u.nome}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{u.email}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={u.role === "admin" ? "default" : "secondary"}
-                      className="capitalize"
-                    >
-                      {u.role === "admin" ? "Admin" : "Colaborador"}
-                    </Badge>
-                    {u.id !== currentUser?.id && (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditDialog(u)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openDeleteDialog(u)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <Usuarios usuarios={usuarios} openEditDialog={openEditDialog} openDeleteDialog={openDeleteDialog} currentUser={currentUser} />
 
         {/* Dialog de Edição */}
         <Dialog open={openEdit} onOpenChange={setOpenEdit}>
