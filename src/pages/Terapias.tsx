@@ -191,7 +191,7 @@ export default function Terapias() {
             <CardContent className="p-0">
               {terapias.length === 0 ? (
                 <div className="px-4 py-8 text-center">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     Nenhuma terapia cadastrada ainda
                   </p>
                 </div>
@@ -206,17 +206,17 @@ export default function Terapias() {
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <Sparkles className="h-4 w-4 text-primary flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm text-foreground truncate">
+                            <p className="font-medium text-base text-foreground truncate">
                               {terapia.nome}
                             </p>
                             <div className="flex items-center gap-3 mt-0.5">
                               {terapia.cor && (
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-base text-muted-foreground">
                                   Cor: {terapia.cor}
                                 </p>
                               )}
                               {terapia.icone && (
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-base text-muted-foreground">
                                   Ícone: {terapia.icone}
                                 </p>
                               )}

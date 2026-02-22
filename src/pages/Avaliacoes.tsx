@@ -218,7 +218,7 @@ export default function Avaliacoes() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Avaliações
             </h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <p className="text-muted-foreground text-base mt-1">
               Registre e acompanhe a evolução dos assistidos
             </p>
           </div>
@@ -389,13 +389,13 @@ export default function Avaliacoes() {
                           <p className="font-semibold text-foreground truncate">
                             {getAssistidoNome(av.assistidoId)}
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-base text-muted-foreground">
                             {av.tipoTerapia}
                           </p>
                         </div>
 
                         {av.observacoes && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">
+                          <p className="text-base text-muted-foreground line-clamp-2">
                             {av.observacoes}
                           </p>
                         )}
@@ -405,7 +405,7 @@ export default function Avaliacoes() {
                             {av.encaminhamentos.map((enc, idx) => (
                               <span
                                 key={idx}
-                                className="text-xs bg-secondary px-2 py-0.5 rounded-full text-secondary-foreground"
+                                className="text-sm bg-secondary px-2 py-0.5 rounded-full text-secondary-foreground"
                               >
                                 {enc}
                               </span>
@@ -413,7 +413,7 @@ export default function Avaliacoes() {
                           </div>
                         )}
 
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-base text-muted-foreground">
                           {new Date(av.dataAvaliacao).toLocaleDateString(
                             "pt-BR",
                           )}
@@ -433,7 +433,7 @@ export default function Avaliacoes() {
 
               {/* Legendas */}
               <div className="px-4 py-3 border-t border-border bg-muted/30">
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <div className="flex items-center gap-4 text-base text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-3.5 w-3.5 text-primary" />
                     <span>Melhora</span>
@@ -460,7 +460,7 @@ export default function Avaliacoes() {
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-base text-muted-foreground">
                     Página {currentPage} de {totalPages}
                   </span>
                   <Button

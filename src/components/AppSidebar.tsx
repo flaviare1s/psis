@@ -57,10 +57,10 @@ export function AppSidebar() {
               className="h-14 w-14 rounded-full object-cover"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-sidebar-foreground truncate">
+              <p className="text-base font-bold text-sidebar-foreground truncate">
                 PSIS
               </p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">
+              <p className="text-base text-sidebar-foreground/60 truncate">
                 Programa Saúde Integral do Ser
               </p>
             </div>
@@ -118,10 +118,10 @@ export function AppSidebar() {
         <div className="px-3 py-3 border-t border-sidebar-border">
           <div className="flex items-center justify-between">
             <div className="min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
+              <p className="text-base font-medium text-sidebar-foreground truncate">
                 {user?.nome}
               </p>
-              <p className="text-xs text-sidebar-foreground/60 capitalize">
+              <p className="text-base text-sidebar-foreground/60 capitalize">
                 {user?.role}
               </p>
             </div>

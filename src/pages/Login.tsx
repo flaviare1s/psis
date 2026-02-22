@@ -113,10 +113,10 @@ export default function Login() {
             <h1 className="text-3xl font-display font-bold text-foreground">
               PSIS
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-base text-muted-foreground mt-1">
               Programa Saúde Integral do Ser
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Grupo Espírita Meimei
             </p>
           </div>
@@ -148,7 +148,7 @@ export default function Login() {
             </div>
 
             {error && (
-              <p className="text-sm text-destructive text-center">{error}</p>
+              <p className="text-base text-destructive text-center">{error}</p>
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
@@ -161,7 +161,7 @@ export default function Login() {
                   <Button
                     type="button"
                     variant="link"
-                    className="text-sm text-muted-foreground hover:text-primary"
+                    className="text-base text-muted-foreground hover:text-primary"
                   >
                     Redefinir senha
                   </Button>

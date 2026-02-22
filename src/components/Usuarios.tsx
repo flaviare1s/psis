@@ -39,10 +39,10 @@ export const Usuarios = ({
                       <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">
+                      <p className="font-medium text-base text-foreground truncate">
                         {u.nome}
                       </p>
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className="text-base text-muted-foreground truncate">
                         {u.email}
                       </p>
                     </div>

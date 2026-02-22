@@ -274,7 +274,7 @@ export default function Configuracoes() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Configurações
             </h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <p className="text-muted-foreground text-base mt-1">
               Gerenciar usuários e permissões
             </p>
           </div>
@@ -356,7 +356,7 @@ export default function Configuracoes() {
 
         {/* Legenda */}
         <div className="px-4 py-3 border-t border-border bg-muted/30">
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-4 text-base text-muted-foreground">
             <div className="flex items-center gap-2">
               <Shield className="h-3.5 w-3.5 text-primary" />
               <span>Admin</span>
@@ -393,7 +393,7 @@ export default function Configuracoes() {
                   disabled
                   className="bg-muted"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   O e-mail não pode ser alterado.
                 </p>
               </div>

@@ -93,7 +93,7 @@ export default function Atendimentos() {
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             Atendimentos
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-muted-foreground text-base mt-1">
             Registro de sessões por terapia
           </p>
         </div>
@@ -110,14 +110,14 @@ export default function Atendimentos() {
             <div key={terapia.id}>
               <div className="flex items-center gap-2 mb-3">
                 <div
-                  className={`w-6 h-6 rounded ${terapia.cor} flex items-center justify-center text-sm`}
+                  className={`w-6 h-6 rounded ${terapia.cor} flex items-center justify-center text-base`}
                 >
                   <IconComponent className="h-3.5 w-3.5 text-white" />
                 </div>
                 <h2 className="font-semibold text-foreground">
                   {terapia.nome}
                 </h2>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-base text-muted-foreground">
                   ({atendimentosTerapia.length})
                 </span>
               </div>
@@ -140,18 +140,18 @@ export default function Atendimentos() {
                     >
                       <CardContent className="p-4 flex items-center justify-between">
                         <div>
-                          <p className="font-semibold text-foreground text-sm">
+                          <p className="font-semibold text-foreground text-base">
                             {assistido?.nome}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-base text-muted-foreground">
                             Terapeuta: {terapeuta?.nome}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-bold text-foreground">
+                          <p className="text-base font-bold text-foreground">
                             {presencas}/10
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-base text-muted-foreground">
                             sessões
                           </p>
                         </div>

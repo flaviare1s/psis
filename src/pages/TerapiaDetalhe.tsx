@@ -220,7 +220,7 @@ export default function TerapiaDetalhe() {
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
+                    <p className="text-sm sm:text-sm text-muted-foreground leading-tight">
                       {stat.label}
                     </p>
                     <p className="text-xl sm:text-2xl font-bold text-foreground mt-0.5 sm:mt-1">
@@ -300,19 +300,22 @@ export default function TerapiaDetalhe() {
                   return (
                     <div
                       key={atendimento.id}
-                      className="px-4 py-3 hover:bg-muted/50 transition-colors"
+                      className="px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                      onClick={() =>
+                        navigate(`/assistidos/${atendimento.assistidoId}`)
+                      }
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-sm text-foreground">
+                          <p className="font-medium text-base text-foreground">
                             {assistido?.nome || "Assistido não encontrado"}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-sm text-muted-foreground mt-1">
                             {numSessoes}{" "}
                             {numSessoes === 1 ? "sessão" : "sessões"}
                           </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-base text-muted-foreground">
                           {new Date(atendimento.criadoEm).toLocaleDateString(
                             "pt-BR",
                           )}

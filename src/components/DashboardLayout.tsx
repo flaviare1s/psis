@@ -14,11 +14,11 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <main className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center gap-3 border-b border-border px-4 bg-card">
-            <SidebarTrigger />
+          <header className="h-16 flex items-center gap-3 border-b border-border px-2 bg-card">
+            <SidebarTrigger className="md:hidden" />
             <Link
               to="/dashboard"
-              className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              className="font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
               PSIS - Programa Saúde Integral do Ser
             </Link>
