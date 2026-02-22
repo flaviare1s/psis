@@ -7,7 +7,7 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider,
 } from "firebase/auth";
-import { auth } from "./config";
+import { auth, secondaryAuth } from "./config";
 import { getUsuarioByUid, createUsuario } from "./usuarios";
 
 /**
@@ -34,10 +34,12 @@ export async function signOut() {
 /**
  * Cria novo usuário com autenticação e documento no Firestore
  * Apenas admins podem criar usuários
+ * Usa uma instância secundária do Firebase para não afetar a sessão atual
  */
 export async function createUser(email, password, nome, role) {
+  // Criar novo usuário usando a instância secundária (não afeta a sessão principal)
   const userCredential = await createUserWithEmailAndPassword(
-    auth,
+    secondaryAuth,
     email,
     password,
   );
@@ -45,6 +47,9 @@ export async function createUser(email, password, nome, role) {
 
   // Criar documento do usuário no Firestore
   await createUsuario(uid, { nome, email, role });
+
+  // Fazer logout da instância secundária
+  await firebaseSignOut(secondaryAuth);
 
   return uid;
 }

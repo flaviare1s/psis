@@ -55,6 +55,7 @@ export default function Configuracoes() {
 
   useEffect(() => {
     loadUsuarios();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadUsuarios = async () => {
@@ -95,7 +96,21 @@ export default function Configuracoes() {
       loadUsuarios();
     } catch (error: unknown) {
       console.error("Erro ao criar usuário:", error);
-      const errorMessage = error instanceof Error ? error.message : "Não foi possível criar o usuário.";
+      let errorMessage = "Não foi possível criar o usuário.";
+
+      if (error && typeof error === "object" && "code" in error) {
+        const firebaseError = error as { code: string; message?: string };
+        if (firebaseError.code === "auth/email-already-in-use") {
+          errorMessage = "Este e-mail já está cadastrado no sistema.";
+        } else if (firebaseError.code === "auth/invalid-email") {
+          errorMessage = "E-mail inválido.";
+        } else if (firebaseError.code === "auth/weak-password") {
+          errorMessage = "A senha deve ter no mínimo 6 caracteres.";
+        } else if (firebaseError.message) {
+          errorMessage = firebaseError.message;
+        }
+      }
+
       toast({
         title: "Erro",
         description: errorMessage,
