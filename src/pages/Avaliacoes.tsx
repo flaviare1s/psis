@@ -431,31 +431,21 @@ export default function Avaliacoes() {
                 </Card>
               ))}
 
-              {/* Legenda */}
-              <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Badge variant="default" className="flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3" />
-                  </Badge>
-                  <span className="text-muted-foreground">Melhora</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="flex items-center gap-1"
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Badge>
-                  <span className="text-muted-foreground">Estável</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="destructive"
-                    className="flex items-center gap-1"
-                  >
-                    <TrendingDown className="h-3 w-3" />
-                  </Badge>
-                  <span className="text-muted-foreground">Piora</span>
+              {/* Legendas */}
+              <div className="px-4 py-3 border-t border-border bg-muted/30">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                    <span>Melhora</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Minus className="h-3.5 w-3.5" />
+                    <span>Estável</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingDown className="h-3.5 w-3.5 text-destructive" />
+                    <span>Piora</span>
+                  </div>
                 </div>
               </div>
 
