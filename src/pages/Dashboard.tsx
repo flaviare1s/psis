@@ -7,6 +7,7 @@ import {
   TrendingUp,
   Heart,
   LucideIcon,
+  Sparkle,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -56,8 +57,6 @@ interface Avaliacao {
 interface Terapia {
   id: string;
   nome: string;
-  cor: string;
-  icone: string;
 }
 
 export default function Dashboard() {
@@ -91,12 +90,6 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getIconComponent = (iconName: string): LucideIcon => {
-    const iconsMap = LucideIcons as unknown as Record<string, LucideIcon>;
-    const Icon = iconsMap[iconName];
-    return Icon || LucideIcons.Circle;
   };
 
   const stats = [
@@ -173,7 +166,6 @@ export default function Dashboard() {
               const count = atendimentos.filter(
                 (a) => a.tipoTerapia === t.nome,
               ).length;
-              const IconComponent = getIconComponent(t.icone);
               return (
                 <Card
                   key={t.id}
@@ -182,9 +174,9 @@ export default function Dashboard() {
                 >
                   <CardContent className="p-5">
                     <div
-                      className={`w-12 h-12 rounded-xl ${t.cor} flex items-center justify-center mb-3`}
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3`}
                     >
-                      <IconComponent className="h-6 w-6 text-white" />
+                      <Sparkle className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="font-semibold text-foreground text-sm">
                       {t.nome}

@@ -4,6 +4,7 @@ import {
   ClipboardList,
   BarChart3,
   Settings,
+  Sparkles,
   LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
@@ -30,6 +31,7 @@ const menuItems = [
 ];
 
 const adminItems = [
+  { title: "Terapias", url: "/terapias", icon: Sparkles },
   { title: "Configurações", url: "/configuracoes", icon: Settings },
 ];
 

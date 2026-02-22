@@ -11,6 +11,7 @@ import Assistidos from "./pages/Assistidos";
 import AssistidoDetalhe from "./pages/AssistidoDetalhe";
 import Atendimentos from "./pages/Atendimentos";
 import Metricas from "./pages/Metricas";
+import Terapias from "./pages/Terapias";
 import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 
@@ -67,6 +68,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Metricas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/terapias"
+              element={
+                <ProtectedRoute>
+                  <Terapias />
                 </ProtectedRoute>
               }
             />
