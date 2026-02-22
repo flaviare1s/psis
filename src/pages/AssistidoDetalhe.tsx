@@ -69,20 +69,33 @@ export default function AssistidoDetalhe() {
     if (!id) return;
 
     try {
-      const [assistidoData, atendimentosData, avaliacoesData, terapiasData] =
-        await Promise.all([
-          getAssistido(id),
-          getAtendimentosByAssistido(id),
-          getAvaliacoesByAssistido(id),
-          getTerapias(),
-        ]);
-
+      // Carregar assistido primeiro (essencial)
+      const assistidoData = await getAssistido(id);
       setAssistido(assistidoData as Assistido);
-      setAtendimentos(atendimentosData as Atendimento[]);
-      setAvaliacoes(avaliacoesData as Avaliacao[]);
+
+      // Carregar terapias (essencial)
+      const terapiasData = await getTerapias();
       setTerapias(terapiasData as Terapia[]);
+
+      // Carregar atendimentos e avaliações de forma independente
+      // Se falhar, não afeta o carregamento do assistido
+      try {
+        const atendimentosData = await getAtendimentosByAssistido(id);
+        setAtendimentos(atendimentosData as Atendimento[]);
+      } catch (error) {
+        console.warn("Erro ao carregar atendimentos:", error);
+        setAtendimentos([]);
+      }
+
+      try {
+        const avaliacoesData = await getAvaliacoesByAssistido(id);
+        setAvaliacoes(avaliacoesData as Avaliacao[]);
+      } catch (error) {
+        console.warn("Erro ao carregar avaliações:", error);
+        setAvaliacoes([]);
+      }
     } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+      console.error("Erro ao carregar dados essenciais:", error);
     } finally {
       setLoading(false);
     }

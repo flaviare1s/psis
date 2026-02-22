@@ -43,10 +43,14 @@ export async function getAvaliacoesByAssistido(assistidoId) {
   const q = query(
     collection(db, COLLECTION),
     where("assistidoId", "==", assistidoId),
-    orderBy("dataAvaliacao", "desc"),
   );
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const avaliacoes = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  
+  // Ordenar por data no código para evitar necessidade de índice composto
+  return avaliacoes.sort((a, b) => {
+    return new Date(b.dataAvaliacao) - new Date(a.dataAvaliacao);
+  });
 }
 
 /**
