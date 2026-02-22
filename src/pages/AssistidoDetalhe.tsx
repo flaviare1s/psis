@@ -263,7 +263,7 @@ export default function AssistidoDetalhe() {
             <h1 className="text-2xl font-bold text-foreground">
               {assistido.nome}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Início:{" "}
               {new Date(assistido.dataInicio).toLocaleDateString("pt-BR")}
             </p>
@@ -304,7 +304,7 @@ export default function AssistidoDetalhe() {
                           {terapia.nome}
                         </CardTitle>
                       </div>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-base text-muted-foreground">
                         Nº de sessões:{" "}
                         <strong className="text-foreground">
                           {totalPresencas}
@@ -334,13 +334,13 @@ export default function AssistidoDetalhe() {
                                 : "bg-muted/30 border-border/50 hover:bg-muted/50"
                             }`}
                           >
-                            <span className="text-xs font-bold text-muted-foreground">
+                            <span className="text-base font-bold text-muted-foreground">
                               {i + 1}ª
                             </span>
                             {presente ? (
                               <>
                                 <CheckCircle2 className="h-5 w-5 text-primary my-1" />
-                                <span className="text-[10px] text-muted-foreground min-h-[14px]">
+                                <span className="text-xs text-muted-foreground min-h-[14px]">
                                   {sessao?.data
                                     ? new Date(sessao.data).toLocaleDateString(
                                         "pt-BR",
@@ -352,7 +352,7 @@ export default function AssistidoDetalhe() {
                             ) : (
                               <>
                                 <Circle className="h-5 w-5 text-border my-1" />
-                                <span className="text-[10px] text-transparent min-h-[14px]">
+                                <span className="text-xs text-transparent min-h-[14px]">
                                   00/00
                                 </span>
                               </>
@@ -379,7 +379,7 @@ export default function AssistidoDetalhe() {
                 <Card key={av.id} className="border-border/50">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-sm text-foreground">
+                      <span className="font-semibold text-base text-foreground">
                         {av.tipoTerapia}
                       </span>
                       <Badge
@@ -394,20 +394,20 @@ export default function AssistidoDetalhe() {
                         {av.statusEvolucao}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-base text-muted-foreground">
                       {av.observacoes}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {av.encaminhamentos.map((e, idx) => (
                         <span
                           key={idx}
-                          className="text-xs bg-secondary px-2 py-0.5 rounded-full text-secondary-foreground"
+                          className="text-base bg-secondary px-2 py-0.5 rounded-full text-secondary-foreground"
                         >
                           {e}
                         </span>
                       ))}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-base text-muted-foreground mt-2">
                       {new Date(av.dataAvaliacao).toLocaleDateString("pt-BR")}
                     </p>
                   </CardContent>

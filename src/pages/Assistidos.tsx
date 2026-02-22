@@ -133,7 +133,7 @@ export default function Assistidos() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Assistidos
             </h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <p className="text-muted-foreground text-base mt-1">
               Gerenciar assistidos do programa
             </p>
           </div>
@@ -180,7 +180,7 @@ export default function Assistidos() {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center justify-center gap-2 text-base text-muted-foreground">
             <Button
               variant="outline"
               size="sm"
@@ -219,15 +219,14 @@ export default function Assistidos() {
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">{a.nome}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-base text-muted-foreground">
                         Início:{" "}
-                        {new Date(a.dataInicio).toLocaleDateString("pt-BR")} ·{" "}
-                        {count} terapia(s)
+                        {new Date(a.dataInicio).toLocaleDateString("pt-BR")}
                       </p>
                     </div>
                   </div>
                   <span
-                    className={`text-xs px-2 py-1 rounded-full font-medium ${a.status === "Ativo" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
+                    className={`text-base px-2 py-1 rounded-full font-medium ${a.status === "Ativo" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
                   >
                     {a.status}
                   </span>

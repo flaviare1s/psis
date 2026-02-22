@@ -134,7 +134,7 @@ export default function Dashboard() {
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
             Sistema de gestão do PSIS
           </h1>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-base text-muted-foreground mt-1">
             {new Date().toLocaleDateString("pt-BR", {
               weekday: "long",
               year: "numeric",
@@ -151,7 +151,7 @@ export default function Dashboard() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">{s.label}</p>
+                    <p className="text-base text-muted-foreground">{s.label}</p>
                     <p className="text-2xl font-bold text-foreground mt-1">
                       {s.value}
                     </p>
@@ -183,10 +183,10 @@ export default function Dashboard() {
                     >
                       <Sparkle className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-foreground text-sm">
+                    <h3 className="font-semibold text-foreground text-base">
                       {t.nome}
                     </h3>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-base text-muted-foreground mt-1">
                       {count} atendimento(s)
                     </p>
                   </CardContent>
@@ -211,18 +211,18 @@ export default function Dashboard() {
                   return (
                     <div
                       key={a.id}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
+                      className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors gap-3"
                       onClick={() => navigate(`/assistidos/${a.id}`)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-base shrink-0">
                           {a.nome.charAt(0)}
                         </div>
                         <div>
-                          <p className="font-medium text-sm text-foreground">
+                          <p className="font-semibold text-base text-foreground">
                             {a.nome}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-base text-muted-foreground">
                             {atendimentosAssistido.length > 0
                               ? atendimentosAssistido
                                   .map((at) => at.tipoTerapia)
@@ -232,7 +232,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full font-medium ${a.status === "Ativo" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
+                        className={`text-base px-2 py-1 rounded-full font-medium ${a.status === "Ativo" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
                       >
                         {a.status}
                       </span>

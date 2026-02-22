@@ -148,7 +148,7 @@ export default function Metricas() {
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             Métricas
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-muted-foreground text-base mt-1">
             Visão geral da eficácia do programa
           </p>
         </div>
@@ -162,7 +162,9 @@ export default function Metricas() {
                     .length
                 }
               </p>
-              <p className="text-sm text-muted-foreground">Assistidos Ativos</p>
+              <p className="text-base text-muted-foreground">
+                Assistidos Ativos
+              </p>
             </CardContent>
           </Card>
           <Card className="border-border/50">
@@ -170,7 +172,7 @@ export default function Metricas() {
               <p className="text-3xl font-bold text-accent">
                 {totalSessoesDoMes}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 Atendimentos ({nomeMesCapitalizado}/{anoAtual})
               </p>
             </CardContent>
@@ -180,7 +182,7 @@ export default function Metricas() {
               <p className="text-3xl font-bold text-success">
                 {avaliacoes.length}
               </p>
-              <p className="text-sm text-muted-foreground">Avaliações</p>
+              <p className="text-base text-muted-foreground">Avaliações</p>
             </CardContent>
           </Card>
         </div>
@@ -223,9 +225,7 @@ export default function Metricas() {
                       cx="50%"
                       cy="50%"
                       outerRadius={80}
-                      label={({ percent }) =>
-                        `${(percent * 100).toFixed(0)}%`
-                      }
+                      label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                     >
                       {evolucaoData.map((_, i) => (
                         <Cell key={i} fill={pieColors[i]} />
@@ -236,7 +236,7 @@ export default function Metricas() {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-base">
                   Nenhuma avaliação registrada ainda.
                 </p>
               )}
