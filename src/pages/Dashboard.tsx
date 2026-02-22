@@ -1,49 +1,99 @@
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  TERAPIAS,
-  mockAssistidos,
-  mockAtendimentos,
-  mockAvaliacoes,
-} from "@/lib/mock-data";
 import { Users, CalendarCheck, TrendingUp, Heart } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getAssistidos } from "@/firebase/assistidos";
+import { getAtendimentos } from "@/firebase/atendimentos";
+import { getAvaliacoes } from "@/firebase/avaliacoes";
+import { getTerapias } from "@/firebase/terapias";
 
-const stats = [
-  {
-    label: "Assistidos Ativos",
-    value: mockAssistidos.filter((a) => a.status === "Ativo").length,
-    icon: Users,
-    color: "text-primary",
-  },
-  {
-    label: "Atendimentos",
-    value: mockAtendimentos.length,
-    icon: CalendarCheck,
-    color: "text-accent",
-  },
-  {
-    label: "Avaliações",
-    value: mockAvaliacoes.length,
-    icon: TrendingUp,
-    color: "text-success",
-  },
-  {
-    label: "Taxa de Melhora",
-    value: `${Math.round((mockAvaliacoes.filter((a) => a.statusEvolucao === "Melhora").length / Math.max(mockAvaliacoes.length, 1)) * 100)}%`,
-    icon: Heart,
-    color: "text-destructive",
-  },
-];
+interface Terapia {
+  id: string;
+  nome: string;
+  cor: string;
+  icone: string;
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [assistidos, setAssistidos] = useState<any[]>([]);
+  const [atendimentos, setAtendimentos] = useState<any[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<any[]>([]);
+  const [terapias, setTerapias] = useState<Terapia[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [assistidosData, atendimentosData, avaliacoesData, terapiasData] =
+        await Promise.all([
+          getAssistidos(),
+          getAtendimentos(),
+          getAvaliacoes(),
+          getTerapias(),
+        ]);
+
+      setAssistidos(assistidosData);
+      setAtendimentos(atendimentosData);
+      setAvaliacoes(avaliacoesData);
+      setTerapias(terapiasData as Terapia[]);
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getIconComponent = (iconName: string) => {
+    const Icon = (LucideIcons as any)[iconName];
+    return Icon || LucideIcons.Circle;
+  };
+
+  const stats = [
+    {
+      label: "Assistidos Ativos",
+      value: assistidos.filter((a) => a.status === "Ativo").length,
+      icon: Users,
+      color: "text-primary",
+    },
+    {
+      label: "Atendimentos",
+      value: atendimentos.length,
+      icon: CalendarCheck,
+      color: "text-accent",
+    },
+    {
+      label: "Avaliações",
+      value: avaliacoes.length,
+      icon: TrendingUp,
+      color: "text-success",
+    },
+    {
+      label: "Taxa de Melhora",
+      value: `${Math.round((avaliacoes.filter((a) => a.statusEvolucao === "Melhora").length / Math.max(avaliacoes.length, 1)) * 100)}%`,
+      icon: Heart,
+      color: "text-destructive",
+    },
+  ];
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-8">Carregando...</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             Painel de Controle
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -72,17 +122,16 @@ export default function Dashboard() {
 
         {/* Terapias */}
         <div>
-          <h2 className="text-xl font-display font-bold text-foreground mb-4">
-            Terapias
-          </h2>
+          <h2 className="text-xl font-bold text-foreground mb-4">Terapias</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {TERAPIAS.map((t) => {
-              const count = mockAtendimentos.filter(
+            {terapias.map((t) => {
+              const count = atendimentos.filter(
                 (a) => a.tipoTerapia === t.nome,
               ).length;
+              const IconComponent = getIconComponent(t.icone);
               return (
                 <Card
-                  key={t.nome}
+                  key={t.id}
                   className="cursor-pointer hover:shadow-lg transition-all duration-200 border-border/50 hover:scale-[1.02]"
                   onClick={() => navigate("/atendimentos")}
                 >
@@ -90,7 +139,7 @@ export default function Dashboard() {
                     <div
                       className={`w-12 h-12 rounded-xl ${t.cor} flex items-center justify-center mb-3`}
                     >
-                      <t.icone className="h-6 w-6 text-white" />
+                      <IconComponent className="h-6 w-6 text-white" />
                     </div>
                     <h3 className="font-semibold text-foreground text-sm">
                       {t.nome}
@@ -107,14 +156,14 @@ export default function Dashboard() {
 
         {/* Assistidos recentes */}
         <div>
-          <h2 className="text-xl font-display font-bold text-foreground mb-4">
+          <h2 className="text-xl font-bold text-foreground mb-4">
             Assistidos Recentes
           </h2>
           <Card className="border-border/50">
             <CardContent className="p-0">
               <div className="divide-y divide-border">
-                {mockAssistidos.slice(0, 5).map((a) => {
-                  const atendimentos = mockAtendimentos.filter(
+                {assistidos.slice(0, 5).map((a) => {
+                  const atendimentosAssistido = atendimentos.filter(
                     (at) => at.assistidoId === a.id,
                   );
                   return (
@@ -132,9 +181,9 @@ export default function Dashboard() {
                             {a.nome}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {atendimentos.length > 0
-                              ? atendimentos
-                                  .map((at) => at.tipoTerapia)
+                            {atendimentosAssistido.length > 0
+                              ? atendimentosAssistido
+                                  .map((at: any) => at.tipoTerapia)
                                   .join(", ")
                               : "Sem terapia"}
                           </p>

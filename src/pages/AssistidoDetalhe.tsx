@@ -1,22 +1,105 @@
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  mockAssistidos,
-  mockAtendimentos,
-  mockAvaliacoes,
-  TERAPIAS,
-} from "@/lib/mock-data";
 import { ArrowLeft, CheckCircle2, Circle } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import { getAssistido } from "@/firebase/assistidos";
+import { getAtendimentosByAssistido } from "@/firebase/atendimentos";
+import { getAvaliacoesByAssistido } from "@/firebase/avaliacoes";
+import { getTerapias } from "@/firebase/terapias";
+import { useAuth } from "@/lib/auth-context";
+
+interface Assistido {
+  id: string;
+  nome: string;
+  status: "Ativo" | "Inativo";
+  dataInicio: string;
+}
+
+interface Sessao {
+  numero: number;
+  data: string | null;
+  presente: boolean;
+  observacoes: string;
+}
+
+interface Atendimento {
+  id: string;
+  assistidoId: string;
+  terapeutaId: string;
+  tipoTerapia: string;
+  sessoes: Sessao[];
+}
+
+interface Avaliacao {
+  id: string;
+  assistidoId: string;
+  tipoTerapia: string;
+  statusEvolucao: "Melhora" | "Estável" | "Piora";
+  dataAvaliacao: string;
+  observacoes: string;
+  encaminhamentos: string[];
+}
+
+interface Terapia {
+  id: string;
+  nome: string;
+  cor: string;
+  icone: string;
+}
 
 export default function AssistidoDetalhe() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const assistido = mockAssistidos.find((a) => a.id === id);
-  const atendimentos = mockAtendimentos.filter((a) => a.assistidoId === id);
-  const avaliacoes = mockAvaliacoes.filter((a) => a.assistidoId === id);
+  const { user } = useAuth();
+  const [assistido, setAssistido] = useState<Assistido | null>(null);
+  const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [terapias, setTerapias] = useState<Terapia[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, [id]);
+
+  const loadData = async () => {
+    if (!id) return;
+
+    try {
+      const [assistidoData, atendimentosData, avaliacoesData, terapiasData] =
+        await Promise.all([
+          getAssistido(id),
+          getAtendimentosByAssistido(id),
+          getAvaliacoesByAssistido(id),
+          getTerapias(),
+        ]);
+
+      setAssistido(assistidoData as Assistido);
+      setAtendimentos(atendimentosData as Atendimento[]);
+      setAvaliacoes(avaliacoesData as Avaliacao[]);
+      setTerapias(terapiasData as Terapia[]);
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getIconComponent = (iconName: string) => {
+    const Icon = (LucideIcons as any)[iconName];
+    return Icon || LucideIcons.Circle;
+  };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-8">Carregando...</div>
+      </DashboardLayout>
+    );
+  }
 
   if (!assistido) {
     return (
@@ -34,7 +117,7 @@ export default function AssistidoDetalhe() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-display font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-foreground">
               {assistido.nome}
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -50,28 +133,29 @@ export default function AssistidoDetalhe() {
           </Badge>
         </div>
 
-        {/* Ficha de Atividades - replicating the paper form */}
+        {/* Ficha de Atividades */}
         <div>
-          <h2 className="text-xl font-display font-bold text-foreground mb-4">
+          <h2 className="text-xl font-bold text-foreground mb-4">
             Ficha de Atividades
           </h2>
           <div className="space-y-4">
-            {TERAPIAS.map((terapia) => {
+            {terapias.map((terapia) => {
               const atendimento = atendimentos.find(
                 (a) => a.tipoTerapia === terapia.nome,
               );
               const sessoes = atendimento?.sessoes || [];
               const totalPresencas = sessoes.filter((s) => s.presente).length;
+              const IconComponent = getIconComponent(terapia.icone);
 
               return (
-                <Card key={terapia.nome} className="border-border/50">
+                <Card key={terapia.id} className="border-border/50">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-8 h-8 rounded-lg ${terapia.cor} flex items-center justify-center text-lg`}
                         >
-                          <terapia.icone className="h-4 w-4 text-white" />
+                          <IconComponent className="h-4 w-4 text-white" />
                         </div>
                         <CardTitle className="text-base font-semibold">
                           {terapia.nome}
@@ -131,7 +215,7 @@ export default function AssistidoDetalhe() {
         {/* Avaliações */}
         {avaliacoes.length > 0 && (
           <div>
-            <h2 className="text-xl font-display font-bold text-foreground mb-4">
+            <h2 className="text-xl font-bold text-foreground mb-4">
               Avaliações de Evolução
             </h2>
             <div className="space-y-3">
@@ -158,9 +242,9 @@ export default function AssistidoDetalhe() {
                       {av.observacoes}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {av.encaminhamentos.map((e) => (
+                      {av.encaminhamentos.map((e, idx) => (
                         <span
-                          key={e}
+                          key={idx}
                           className="text-xs bg-secondary px-2 py-0.5 rounded-full text-secondary-foreground"
                         >
                           {e}

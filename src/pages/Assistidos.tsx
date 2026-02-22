@@ -1,39 +1,126 @@
-import { useState } from 'react';
-import { DashboardLayout } from '@/components/DashboardLayout';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { mockAssistidos, mockAtendimentos } from '@/lib/mock-data';
-import { Search, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from "react";
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { getAssistidos, createAssistido } from "@/firebase/assistidos";
+import { getAtendimentosByAssistido } from "@/firebase/atendimentos";
+import { useToast } from "@/hooks/use-toast";
+
+interface Assistido {
+  id: string;
+  nome: string;
+  status: "Ativo" | "Inativo";
+  dataInicio: string;
+}
 
 export default function Assistidos() {
-  const [busca, setBusca] = useState('');
-  const [novoNome, setNovoNome] = useState('');
+  const [busca, setBusca] = useState("");
+  const [novoNome, setNovoNome] = useState("");
   const [open, setOpen] = useState(false);
+  const [assistidos, setAssistidos] = useState<Assistido[]>([]);
+  const [atendimentosCount, setAtendimentosCount] = useState<
+    Record<string, number>
+  >({});
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const filtrados = mockAssistidos.filter((a) =>
-    a.nome.toLowerCase().includes(busca.toLowerCase())
-  );
+  useEffect(() => {
+    loadAssistidos();
+  }, []);
 
-  const handleCadastrar = () => {
-    if (novoNome.trim()) {
-      // In a real app, this would persist
-      setNovoNome('');
-      setOpen(false);
+  const loadAssistidos = async () => {
+    try {
+      const data = await getAssistidos();
+      setAssistidos(data as Assistido[]);
+
+      // Carregar contagem de atendimentos para cada assistido
+      const counts: Record<string, number> = {};
+      for (const assistido of data) {
+        const atendimentos = await getAtendimentosByAssistido(assistido.id);
+        counts[assistido.id] = atendimentos.length;
+      }
+      setAtendimentosCount(counts);
+    } catch (error) {
+      console.error("Erro ao carregar assistidos:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os assistidos.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleCadastrar = async () => {
+    if (!novoNome.trim()) {
+      toast({
+        title: "Erro",
+        description: "Digite o nome do assistido.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await createAssistido({ nome: novoNome });
+      toast({
+        title: "Sucesso",
+        description: "Assistido cadastrado com sucesso.",
+      });
+      setNovoNome("");
+      setOpen(false);
+      loadAssistidos();
+    } catch (error) {
+      console.error("Erro ao cadastrar assistido:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível cadastrar o assistido.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const filtrados = assistidos.filter((a) =>
+    a.nome.toLowerCase().includes(busca.toLowerCase()),
+  );
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-8">Carregando...</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Assistidos</h1>
-            <p className="text-muted-foreground text-sm mt-1">Gerenciar assistidos do programa</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              Assistidos
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              Gerenciar assistidos do programa
+            </p>
           </div>
 
           <Dialog open={open} onOpenChange={setOpen}>
@@ -50,10 +137,19 @@ export default function Assistidos() {
               <div className="space-y-4 mt-2">
                 <div className="space-y-2">
                   <Label htmlFor="nome">Nome completo</Label>
-                  <Input id="nome" value={novoNome} onChange={(e) => setNovoNome(e.target.value)} placeholder="Nome do assistido" />
+                  <Input
+                    id="nome"
+                    value={novoNome}
+                    onChange={(e) => setNovoNome(e.target.value)}
+                    placeholder="Nome do assistido"
+                  />
                 </div>
-                <Button onClick={handleCadastrar} className="w-full">Cadastrar</Button>
               </div>
+              <DialogFooter>
+                <Button onClick={handleCadastrar} disabled={submitting}>
+                  {submitting ? "Cadastrando..." : "Cadastrar"}
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
@@ -70,7 +166,7 @@ export default function Assistidos() {
 
         <div className="grid gap-3">
           {filtrados.map((a) => {
-            const atendimentos = mockAtendimentos.filter((at) => at.assistidoId === a.id);
+            const count = atendimentosCount[a.id] || 0;
             return (
               <Card
                 key={a.id}
@@ -85,11 +181,15 @@ export default function Assistidos() {
                     <div>
                       <p className="font-semibold text-foreground">{a.nome}</p>
                       <p className="text-xs text-muted-foreground">
-                        Início: {new Date(a.dataInicio).toLocaleDateString('pt-BR')} · {atendimentos.length} terapia(s)
+                        Início:{" "}
+                        {new Date(a.dataInicio).toLocaleDateString("pt-BR")} ·{" "}
+                        {count} terapia(s)
                       </p>
                     </div>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${a.status === 'Ativo' ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'}`}>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${a.status === "Ativo" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
+                  >
                     {a.status}
                   </span>
                 </CardContent>
