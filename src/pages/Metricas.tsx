@@ -17,6 +17,32 @@ import { getAvaliacoes } from "@/firebase/avaliacoes";
 import { getAssistidos } from "@/firebase/assistidos";
 import { getTerapias } from "@/firebase/terapias";
 
+interface Assistido {
+  status: string;
+  [key: string]: string | number | boolean | null;
+}
+
+interface Atendimento {
+  tipoTerapia: string;
+  sessoes: Array<{ presente: boolean; data: string }>;
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | null
+    | Array<{ presente: boolean; data: string }>;
+}
+
+interface Avaliacao {
+  statusEvolucao: string;
+  [key: string]: string | number | boolean | null;
+}
+
+interface Terapia {
+  nome: string;
+  [key: string]: string | number | boolean | null;
+}
+
 const CHART_COLORS = [
   "hsl(145,45%,32%)",
   "hsl(280,50%,55%)",
@@ -26,10 +52,10 @@ const CHART_COLORS = [
 ];
 
 export default function Metricas() {
-  const [atendimentos, setAtendimentos] = useState<any[]>([]);
-  const [avaliacoes, setAvaliacoes] = useState<any[]>([]);
-  const [assistidos, setAssistidos] = useState<any[]>([]);
-  const [terapias, setTerapias] = useState<any[]>([]);
+  const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [assistidos, setAssistidos] = useState<Assistido[]>([]);
+  const [terapias, setTerapias] = useState<Terapia[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,32 +83,54 @@ export default function Metricas() {
     }
   };
 
-  const atendimentosPorTerapia = terapias.map((t, i) => ({
+  const atendimentosPorTerapia = terapias.map((t: Terapia, i) => ({
     nome: t.nome.split(" ")[0],
-    atendimentos: atendimentos.filter((a) => a.tipoTerapia === t.nome).length,
+    atendimentos: atendimentos.filter(
+      (a: Atendimento) => a.tipoTerapia === t.nome,
+    ).length,
     fill: CHART_COLORS[i % CHART_COLORS.length],
   }));
 
   const evolucaoData = [
     {
       status: "Melhora",
-      count: avaliacoes.filter((a) => a.statusEvolucao === "Melhora").length,
+      count: avaliacoes.filter((a: Avaliacao) => a.statusEvolucao === "Melhora")
+        .length,
     },
     {
       status: "Estável",
-      count: avaliacoes.filter((a) => a.statusEvolucao === "Estável").length,
+      count: avaliacoes.filter((a: Avaliacao) => a.statusEvolucao === "Estável")
+        .length,
     },
     {
       status: "Piora",
-      count: avaliacoes.filter((a) => a.statusEvolucao === "Piora").length,
+      count: avaliacoes.filter((a: Avaliacao) => a.statusEvolucao === "Piora")
+        .length,
     },
   ];
   const pieColors = ["hsl(145,60%,40%)", "hsl(35,85%,55%)", "hsl(0,72%,51%)"];
 
-  const totalSessoes = atendimentos.reduce(
-    (acc, at) => acc + at.sessoes.filter((s: any) => s.presente).length,
-    0,
-  );
+  // Calcular sessões do mês atual
+  const dataAtual = new Date();
+  const mesAtual = dataAtual.getMonth(); // 0-11
+  const anoAtual = dataAtual.getFullYear();
+  const nomeMes = dataAtual.toLocaleDateString("pt-BR", { month: "long" });
+  const nomeMesCapitalizado =
+    nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+
+  const totalSessoesDoMes = atendimentos.reduce((acc, at: Atendimento) => {
+    const sessoesDoMes = at.sessoes.filter(
+      (s: { presente: boolean; data: string }) => {
+        if (!s.presente || !s.data) return false;
+        const dataSessao = new Date(s.data);
+        return (
+          dataSessao.getMonth() === mesAtual &&
+          dataSessao.getFullYear() === anoAtual
+        );
+      },
+    );
+    return acc + sessoesDoMes.length;
+  }, 0);
 
   if (loading) {
     return (
@@ -108,15 +156,22 @@ export default function Metricas() {
           <Card className="border-border/50">
             <CardContent className="p-4 text-center">
               <p className="text-3xl font-bold text-primary">
-                {assistidos.filter((a: any) => a.status === "Ativo").length}
+                {
+                  assistidos.filter((a: Assistido) => a.status === "Ativo")
+                    .length
+                }
               </p>
               <p className="text-sm text-muted-foreground">Assistidos Ativos</p>
             </CardContent>
           </Card>
           <Card className="border-border/50">
             <CardContent className="p-4 text-center">
-              <p className="text-3xl font-bold text-accent">{totalSessoes}</p>
-              <p className="text-sm text-muted-foreground">Total de Atendimentos Realizados</p>
+              <p className="text-3xl font-bold text-accent">
+                {totalSessoesDoMes}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Atendimentos ({nomeMesCapitalizado}/{anoAtual})
+              </p>
             </CardContent>
           </Card>
           <Card className="border-border/50">
@@ -124,9 +179,7 @@ export default function Metricas() {
               <p className="text-3xl font-bold text-success">
                 {avaliacoes.length}
               </p>
-              <p className="text-sm text-muted-foreground">
-                Avaliações Realizadas
-              </p>
+              <p className="text-sm text-muted-foreground">Avaliações</p>
             </CardContent>
           </Card>
         </div>

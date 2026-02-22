@@ -452,7 +452,9 @@ export default function AssistidoDetalhe() {
                 <Checkbox
                   id="presente"
                   checked={presenteTemporario}
-                  onCheckedChange={(checked) => setPresenteTemporario(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setPresenteTemporario(checked as boolean)
+                  }
                 />
                 <Label htmlFor="presente" className="cursor-pointer">
                   Marcar como presente
